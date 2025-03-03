@@ -1,43 +1,85 @@
-const pricing_btn = document.querySelectorAll(".pricing_btn ");
-const active_bg = document.querySelector(".active_bg");
-const pricing = document.querySelectorAll(".pricing");
-const payment = document.querySelectorAll(".payment ");
-const monthly = document.querySelectorAll(".monthly");
-const yearly = document.querySelectorAll(".yearly");
-const monthly_icon = document.querySelectorAll(".monthly_icon");
-const yearly_icon = document.querySelectorAll(".yearly_icon");
-
-
-pricing_btn.forEach(function(btn){
-    btn.addEventListener("click",function(){
-        pricing_btn.forEach(btn => btn.classList.remove("active"));
-        this.classList.add("active");
-        // var active_width = this.offsetWidth;
-        var active_left = this.offsetLeft;
-        active_bg.style.cssText = "left:" +active_left+ "px;";
-        var class_name = this.getAttribute("data-class");
-        pricing.forEach(function(c){
-            c.classList.remove("active");
-        });
-        document.querySelector("." + class_name).classList.add("active");
-    });
-});
-
-payment.forEach(function(payment_btn){
-    payment_btn.addEventListener("click",function(){
-     
-
-        if(this.classList.contains("monthly")){
-            monthly.forEach(payment_btn => payment_btn.classList.remove("active"));
-            this.classList.add("active");
-            monthly_icon.forEach(select_icon=> select_icon.classList.remove("active"));
-            this.querySelector(".select_icon").classList.add("active");
+;(function() {
+  
+    'use strict';
+    
+    var c = document.getElementById('c');
+    var ctx = c.getContext('2d');
+    var w = c.width = window.innerWidth;
+    var h = c.height = window.innerHeight;
+    
+    function Pixel(x, y, s) {
+      this.x = x;
+      this.y = y;
+      this.s = s;
+      this.gx = 0;
+      this.gy = 0;
+      this.vx = Math.random() * 10 - 5;
+      this.vy = Math.random() * 10 - 5;
+      this.c = 0;
+    }
+    
+    Pixel.prototype = {
+      constructor: Pixel,
+      update: function() {
+        
+        this.c += 0.1;
+        
+        this.vx = Math.random() * 10 - 50;
+        this.vy = Math.random() * 10 - 50;
+        
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        if(this.x > w) {
+          this.x = 0;
+        } else if(this.x < 0) {
+          this.x = w;
         }
-        if(this.classList.contains("yearly")){
-            yearly.forEach(payment_btn => payment_btn.classList.remove("active"));
-            this.classList.add("active");
-            yearly_icon.forEach(select_icon=> select_icon.classList.remove("active"));
-            this.querySelector(".select_icon").classList.add("active");
+        
+        if(this.y > h) {
+          this.y = 0;
+        } else if(this.y < 0) {
+          this.y = h;
         }
+        
+        this.gx = Math.floor(this.x / this.s) * this.s;
+        this.gy = Math.floor(this.y / this.s) * this.s;
+        
+      },
+      draw: function(ctx) {
+        ctx.save();
+        ctx.translate(this.gx, this.gy);
+        ctx.fillStyle = 'hsl(' + this.c + ', 100%, 50%)';
+        ctx.fillRect(0, 0, this.s, this.s);
+        ctx.restore();
+      }
+    };
+    
+    var pixels = [];
+    var itr = 200;
+    var pixel;
+    
+    for(var i = 0; i < itr; i++) {
+      pixel = new Pixel(
+        Math.random() * w,
+        Math.random() * h,
+        Math.random() * 10
+      );
+      
+      pixels.push(pixel);
+    }
+    
+    requestAnimationFrame(function loop() {
+      requestAnimationFrame(loop);
+      
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.01)';
+      ctx.fillRect(0, 0, w, h);
+      
+      for(var i = 0; i < itr; i++) {
+        pixel = pixels[i];
+        pixel.update();
+        pixel.draw(ctx);
+      }
     });
-});
+    
+  })();
